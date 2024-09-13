@@ -1,0 +1,15 @@
+I used the following resources to learn to use the various tools and technologies in this assignment:
+
+https://maven.apache.org/plugins/maven-checkstyle-plugin/usage.html
+https://stackoverflow.com/a/26957047/6087491
+https://www.jacoco.org/jacoco/trunk/doc/maven.html
+https://spring.io/guides/gs/testing-web
+https://docs.pmd-code.org/latest/pmd_userdocs_installation.html
+
+I have also used the following resource to help me write the code submitted as a part of this assignment:
+
+https://spring.io/guides/gs/testing-web
+https://stackoverflow.com/a/2935935/6087491
+
+However, I have not copy-pasted any code, only read the code present in those resources to understand how to use
+the Spring Boot testing framework, and re-used the same APIs in this submission.
