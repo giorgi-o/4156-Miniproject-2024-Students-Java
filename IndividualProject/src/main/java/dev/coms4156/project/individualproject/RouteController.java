@@ -605,6 +605,55 @@ public class RouteController {
     }
   }
 
+  /**
+   * Endpoint for enrolling a student in a course.
+   * This method handles PATCH requests to enroll a student in a course identified by
+   * department code and course code. If the course exists, the student is enrolled in the course.
+   * If the course is full, the student is not enrolled.
+   * If the course is not found, an error message is returned.
+   * If the student is successfully enrolled, a success message is returned.
+   *
+   * @param deptCode                  the code of the department containing the course
+   *
+   * @param courseCode                the code of the course to enroll the student in
+   *
+   * @return                          a ResponseEntity with a success message if the operation is
+   *                                 successful, or an error message if the course is not found
+   */
+  @PatchMapping(value = "/enrollStudentInCourse", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> enrollStudentInCourse(
+          @RequestParam(value = "deptCode") String deptCode,
+          @RequestParam(value = "courseCode") int courseCode
+  ) {
+    try {
+      boolean doesCourseExists;
+      doesCourseExists = retrieveCourse(deptCode, courseCode).getStatusCode() == HttpStatus.OK;
+
+      if (doesCourseExists) {
+        HashMap<String, Department> departmentMapping;
+        departmentMapping = IndividualProjectApplication.myFileDatabase.getDepartmentMapping();
+        HashMap<String, Course> coursesMapping;
+        coursesMapping = departmentMapping.get(deptCode).getCourseSelection();
+
+        Course requestedCourse = coursesMapping.get(Integer.toString(courseCode));
+        if (requestedCourse.isCourseFull()) {
+          return new ResponseEntity<>("Course is full.", HttpStatus.BAD_REQUEST);
+        }
+
+        boolean isStudentEnrolled = requestedCourse.enrollStudent();
+        if (isStudentEnrolled) {
+          return new ResponseEntity<>("Student has been enrolled.", HttpStatus.OK);
+        } else {
+          return new ResponseEntity<>("Student has not been enrolled.", HttpStatus.BAD_REQUEST);
+        }
+      } else {
+        return new ResponseEntity<>("Course Not Found", HttpStatus.NOT_FOUND);
+      }
+    } catch (Exception e) {
+      return handleException(e);
+    }
+  }
+
   private ResponseEntity<?> handleException(Exception e) {
     System.out.println(e.toString());
     return new ResponseEntity<>("An Error has occurred", HttpStatus.OK);
