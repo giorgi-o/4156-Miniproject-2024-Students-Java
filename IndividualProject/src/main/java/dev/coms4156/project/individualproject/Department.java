@@ -23,6 +23,16 @@ public class Department implements Serializable {
    */
   public Department(String deptCode, HashMap<String, Course> courses, String departmentChair,
                     int numberOfMajors) {
+    if (numberOfMajors < 0) {
+      throw new IllegalArgumentException("Number of majors must be non-negative");
+    }
+    if (deptCode == null || departmentChair == null) {
+      throw new IllegalArgumentException("Department code and department chair must be non-null");
+    }
+    if (deptCode.isEmpty() || departmentChair.isEmpty()) {
+      throw new IllegalArgumentException("Department code and department chair must be non-empty");
+    }
+
     this.courses = courses;
     this.departmentChair = departmentChair;
     this.numberOfMajors = numberOfMajors;
