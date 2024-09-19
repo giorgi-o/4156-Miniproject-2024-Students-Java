@@ -1,5 +1,6 @@
 package dev.coms4156.project.individualproject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -91,6 +92,50 @@ public class RouteController {
 
       }
       return new ResponseEntity<>("Department Not Found", HttpStatus.NOT_FOUND);
+    } catch (Exception e) {
+      return handleException(e);
+    }
+  }
+
+  /**
+   * Displays the details of the requested courses across all departments to the user or
+   * displays the proper error message in response to the request.
+   *
+   * @param courseCode A {@code int} representing the course the user wishes
+   *                   to retrieve.
+   *
+   * @return           A {@code ResponseEntity} object containing either the details of the
+   *                   courses and an HTTP 200 response or, an appropriate message indicating the
+   *                   proper response.
+   */
+  @GetMapping(value = "/retrieveCourses", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> retrieveCourses(
+          @RequestParam(value = "courseCode") int courseCode
+  ) {
+    try {
+
+      ArrayList<Course> courses = new ArrayList<>();
+
+      for (Department dept :
+              IndividualProjectApplication.myFileDatabase.getDepartmentMapping().values()) {
+        HashMap<String, Course> coursesMapping;
+        coursesMapping = dept.getCourseSelection();
+
+        if (coursesMapping.containsKey(Integer.toString(courseCode))) {
+          courses.add(coursesMapping.get(Integer.toString(courseCode)));
+        }
+      }
+
+      if (courses.isEmpty()) {
+        return new ResponseEntity<>("Course Not Found", HttpStatus.NOT_FOUND);
+      } else {
+        StringBuilder coursesString = new StringBuilder();
+        for (Course course : courses) {
+          coursesString.append(course.toString()).append("\n");
+        }
+        return new ResponseEntity<>(coursesString.toString(), HttpStatus.OK);
+      }
+
     } catch (Exception e) {
       return handleException(e);
     }

@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.HashMap;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,6 +80,34 @@ public class RouteControllerUnitTests {
             .andExpect(content().string(containsString("Instructor:")));
 
     courseNotFoundTest(GET, "retrieveCourse", null);
+  }
+
+  @Test
+  @Order(3)
+  void retrieveCoursesTest() throws Exception {
+    mockMvc.perform(get("/retrieveCourses?courseCode=9999"))
+            .andDo(print())
+            .andExpect(status().isNotFound());
+
+    Course mockCsCourse = new Course("Mock CS Instructor", "Mock CS Location", "Mock CS Time", 1);
+    HashMap<String, Department> deptMap = IndividualProjectApplication.myFileDatabase.getDepartmentMapping();
+    Department comsDept = deptMap.get("COMS");
+    comsDept.addCourse("9999", mockCsCourse);
+
+    mockMvc.perform(get("/retrieveCourses?courseCode=9999"))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(content().string(containsString("Mock CS Instructor")));
+
+    Course mockEconCourse = new Course("Mock Econ Instructor", "Mock Econ Location", "Mock Econ Time", 1);
+    Department econDept = deptMap.get("ECON");
+    econDept.addCourse("9999", mockEconCourse);
+
+    mockMvc.perform(get("/retrieveCourses?courseCode=9999"))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(content().string(containsString("Mock Econ Instructor")))
+            .andExpect(content().string(containsString("Mock CS Instructor")));
   }
 
   @Test
