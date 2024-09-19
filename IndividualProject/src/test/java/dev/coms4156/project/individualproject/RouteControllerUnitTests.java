@@ -255,6 +255,27 @@ public class RouteControllerUnitTests {
     courseNotFoundTest(PATCH, "changeCourseLocation", "location=417 IAB");
   }
 
+  @Test
+  @Order(2)
+  void enrollStudentInCourseTest() throws Exception {
+    // test happy path
+    mockMvc.perform(patch("/setEnrollmentCount?deptCode=COMS&courseCode=4156&count=1"));
+    mockMvc.perform(patch("/enrollStudentInCourse?deptCode=COMS&courseCode=4156"))
+              .andDo(print())
+              .andExpect(status().isOk())
+              .andExpect(content().string(containsString("Student has been enrolled")));
+
+    // test course not found
+    courseNotFoundTest(PATCH, "enrollStudentInCourse", null);
+
+    // test course full
+    mockMvc.perform(patch("/setEnrollmentCount?deptCode=COMS&courseCode=4156&count=999"));
+    mockMvc.perform(patch("/enrollStudentInCourse?deptCode=COMS&courseCode=4156"))
+              .andDo(print())
+              .andExpect(status().isBadRequest())
+              .andExpect(content().string(equalTo("Course is full.")));
+  }
+
   @Autowired
   private MockMvc mockMvc;
 }
