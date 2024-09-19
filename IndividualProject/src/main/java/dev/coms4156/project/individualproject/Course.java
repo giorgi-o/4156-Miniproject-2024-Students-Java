@@ -18,11 +18,24 @@ public class Course implements Serializable {
    * @param capacity           The maximum number of students that can enroll in the course.
    */
   public Course(String instructorName, String courseLocation, String timeSlot, int capacity) {
+    if (capacity <= 0) {
+      throw new IllegalArgumentException(
+              "Capacity must be greater than 0");
+    }
+    if (instructorName == null || courseLocation == null || timeSlot == null) {
+      throw new IllegalArgumentException(
+              "Instructor name, course location, and time slot must be non-null");
+    }
+    if (instructorName.isEmpty() || courseLocation.isEmpty() || timeSlot.isEmpty()) {
+      throw new IllegalArgumentException(
+              "Instructor name, course location, and time slot must be non-empty");
+    }
+
     this.courseLocation = courseLocation;
     this.instructorName = instructorName;
     this.courseTimeSlot = timeSlot;
     this.enrollmentCapacity = capacity;
-    this.enrolledStudentCount = 500;
+    this.enrolledStudentCount = Integer.min(500, capacity);
   }
 
   /**
